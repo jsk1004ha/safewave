@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>SafeWave AI Care Dashboard</title>
+<style>
+  :root{
+    --blue:#2f80ed;
+    --blue2:#1478ff;
+    --blue-soft:#eaf3ff;
+    --green:#3dbb68;
+    --green2:#27ae60;
+    --yellow:#ffb020;
+    --red:#ff5252;
+    --ink:#111827;
+    --text:#25304a;
+    --muted:#7b879b;
+    --line:#e8edf5;
+    --panel:#ffffff;
+    --bg:#f5f8fc;
+    --shadow: 0 16px 40px rgba(29, 44, 72, .06), 0 4px 14px rgba(31, 51, 87, .04);
+    --shadow-card: 0 10px 26px rgba(35, 54, 88, .06), 0 2px 8px rgba(35, 54, 88, .04);
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; min-height:100%; }
+  body{
+    background:linear-gradient(135deg,#f3f7fb 0%,#fbfdff 52%,#f4f8fc 100%);
+    font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR","Segoe UI",Arial,sans-serif;
+    color:var(--ink);
+  }
+
+  .stage{
+    width:1024px;
+    height:1536px;
+    margin:0 auto;
+    position:relative;
+    overflow:hidden;
+    background:linear-gradient(140deg,#f6f9fd 0%,#fbfdff 55%,#f6f9fd 100%);
+  }
+
+  .sidebar{
+    position:absolute;
+    left:7px; top:12px;
+    width:174px; height:1512px;
+    border-radius:12px;
+    background:rgba(255,255,255,.94);
+    border:1px solid rgba(236,241,248,.85);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  .logo-wrap{ position:absolute; left:29px; top:35px; }
+  .wifi-logo{
+    position:absolute; left:-42px; top:-3px; width:34px; height:34px;
+  }
+  .brand{ font-weight:800; font-size:27px; line-height:30px; color:#0d5bd3; letter-spacing:-.65px; }
+  .tagline{ margin-top:2px; font-size:12px; color:#718096; font-weight:600; letter-spacing:-.1px; }
+
+  .nav{ position:absolute; left:16px; top:131px; width:156px; }
+  .nav-item{
+    position:relative;
+    height:52px; margin-bottom:12px;
+    display:flex; align-items:center;
+    gap:15px; padding-left:16px;
+    border-radius:8px;
+    color:#64748b; font-size:14px; font-weight:700; letter-spacing:-.15px;
+  }
+  .nav-item svg{ width:22px; height:22px; stroke:#73819a; stroke-width:2; fill:none; }
+  .nav-item.active{ color:#1267f3; background:#edf5ff; }
+  .nav-item.active:before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:3px; border-radius:6px; background:#1478ff;
+  }
+  .nav-item.active svg{ stroke:#1478ff; }
+  .nav-badge{
+    margin-left:auto; margin-right:11px; width:15px; height:15px; border-radius:99px;
+    display:flex; align-items:center; justify-content:center;
+    background:#ff4d59; color:#fff; font-size:9px; font-weight:800;
+    box-shadow:0 2px 6px rgba(255,77,89,.32);
+  }
+
+  .device-card{
+    position:absolute; left:20px; top:1154px; width:148px; height:156px;
+    background:#fff; border:1px solid #e9eff7; border-radius:10px;
+    box-shadow:0 8px 24px rgba(27,44,76,.045);
+    padding:21px 16px 14px 16px;
+  }
+  .device-title{ display:flex; align-items:center; gap:7px; color:#0c4fac; font-size:20px; font-weight:800; letter-spacing:-.45px; line-height:20px; }
+  .device-title svg{ width:30px; height:28px; stroke:#0f7bff; stroke-width:3; fill:none; flex:none; }
+  .device-sub{ margin-left:31px; margin-top:2px; font-size:10px; color:#46617d; font-weight:700; white-space:nowrap; }
+  .device-ok{ display:flex; align-items:center; gap:6px; margin-top:19px; font-size:11px; color:#24a45f; font-weight:700; }
+  .dot{ width:8px; height:8px; border-radius:50%; background:#39bf62; display:inline-block; }
+  .device-btn{
+    height:33px; margin-top:17px; background:#f6faff; border-radius:6px;
+    display:flex; align-items:center; justify-content:center; gap:7px;
+    color:#475569; font-size:11px; font-weight:800; border:1px solid #eef3f8;
+  }
+  .logout{ position:absolute; left:29px; bottom:56px; display:flex; align-items:center; gap:12px; color:#52637d; font-size:14px; font-weight:700; }
+  .logout svg{ width:20px; height:20px; stroke:#73819a; fill:none; stroke-width:2; }
+
+  .main{
+    position:absolute;
+    left:193px; top:12px;
+    width:822px; height:1512px;
+    border-radius:15px;
+    background:rgba(255,255,255,.94);
+    border:1px solid rgba(234,240,247,.95);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  .main:before{
+    content:""; position:absolute; inset:0;
+    background:radial-gradient(circle at 25% 9%, rgba(59,130,246,.025), transparent 34%), radial-gradient(circle at 90% 83%, rgba(59,130,246,.025), transparent 38%);
+    pointer-events:none;
+  }
+  .main-content{ position:absolute; left:17px; top:0; width:788px; height:100%; }
+
+  .topbar{ position:absolute; left:13px; right:13px; top:34px; height:72px; }
+  h1{ margin:0; font-size:24px; line-height:31px; font-weight:900; letter-spacing:-.9px; }
+  .hello-sub{ margin-top:6px; font-size:14px; color:#4b5567; font-weight:600; letter-spacing:-.25px; }
+  .bell-area{ position:absolute; right:149px; top:10px; width:40px; height:42px; display:flex; align-items:center; justify-content:center; }
+  .bell-area svg{ width:27px; height:27px; stroke:#63728b; fill:none; stroke-width:1.9; }
+  .bell-count{ position:absolute; right:3px; top:3px; width:15px; height:15px; border-radius:50%; background:#ff5a64; color:#fff; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:900; box-shadow:0 2px 5px rgba(255,90,100,.35); }
+  .date-block{ position:absolute; right:13px; top:8px; text-align:right; }
+  .date-time{ font-size:16px; font-weight:700; color:#344056; letter-spacing:-.2px; }
+  .date-day{ margin-top:9px; font-size:14px; color:#4b5567; font-weight:500; }
+
+  .status-grid{
+    position:absolute; left:0; top:123px; width:788px; height:157px;
+    display:grid; grid-template-columns:repeat(4,1fr); gap:14px;
+  }
+  .stat-card{
+    background:rgba(255,255,255,.98);
+    border:1px solid #e8eef6; border-radius:10px;
+    box-shadow:var(--shadow-card);
+    padding:25px 28px;
+    position:relative; overflow:hidden;
+  }
+  .stat-card:after{ content:""; position:absolute; inset:0; background:linear-gradient(135deg,transparent 0%,rgba(47,128,237,.018) 100%); pointer-events:none; }
+  .stat-label{ font-size:14px; color:#111827; font-weight:800; letter-spacing:-.3px; }
+  .stat-body{ margin-top:33px; display:flex; align-items:center; gap:14px; }
+  .stat-icon{
+    width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  .stat-icon svg{ width:31px; height:31px; }
+  .stat-icon.green{ background:#48bd69; color:#fff; box-shadow:0 7px 18px rgba(72,189,105,.22); }
+  .stat-icon.blue{ background:#e9f2ff; color:#247cff; }
+  .stat-title{ font-size:21px; line-height:24px; font-weight:900; letter-spacing:-.7px; white-space:nowrap; }
+  .stat-title.green{ color:#31a85a; } .stat-title.blue{ color:#0f74ff; }
+  .stat-note{ margin-top:9px; font-size:11px; color:#5c6677; font-weight:700; letter-spacing:-.25px; white-space:nowrap; }
+
+  .panel{
+    background:rgba(255,255,255,.98);
+    border:1px solid #e7edf5;
+    border-radius:11px;
+    box-shadow:var(--shadow-card);
+    position:absolute;
+    overflow:hidden;
+  }
+  .panel-title{ position:absolute; left:22px; top:20px; font-size:17px; line-height:22px; font-weight:900; letter-spacing:-.55px; color:#111827; }
+  .panel-link{ position:absolute; right:22px; top:22px; color:#5a667a; font-size:12px; font-weight:700; letter-spacing:-.2px; display:flex; align-items:center; gap:5px; }
+  .upper-left{ left:0; top:311px; width:390px; height:402px; }
+  .upper-right{ right:0; top:311px; width:390px; height:402px; }
+  .mid-left{ left:0; top:728px; width:306px; height:425px; }
+  .summary-card{ left:320px; top:728px; width:468px; height:213px; }
+  .chart-card{ left:320px; top:955px; width:468px; height:198px; }
+  .alerts-card{ left:0; top:1167px; width:306px; height:322px; }
+  .timeline-card{ left:320px; top:1167px; width:468px; height:322px; }
+
+  .floor-wrap{ position:absolute; left:22px; top:60px; width:344px; height:274px; }
+  .floor-svg{ width:344px; height:274px; overflow:visible; }
+  .room-label{ font-size:14px; font-weight:800; fill:#111827; letter-spacing:-.2px; }
+  .furniture{ fill:#d9e1ed; opacity:.95; }
+  .floor-wall{ stroke:#cbd5e1; stroke-width:3; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+  .floor-wall-thin{ stroke:#d7e0ec; stroke-width:2; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+  .floor-highlight{ fill:#eaf4ff; stroke:#8db8f5; stroke-width:3; filter:url(#softShadow); }
+  .door{ stroke:#a7b5c8; stroke-width:2.2; fill:none; }
+  .pin-ring{ fill:#dcecff; stroke:#80b3ff; stroke-width:1.5; }
+  .pin-circle{ fill:#2f80ed; }
+  .legend{ position:absolute; left:22px; right:22px; bottom:29px; display:flex; align-items:center; justify-content:space-between; }
+  .legend-item{ display:flex; align-items:center; gap:8px; color:#42516a; font-size:12px; font-weight:700; white-space:nowrap; }
+  .legend-dot{ width:11px; height:11px; border-radius:50%; display:inline-block; }
+
+  .heat-status{ position:absolute; right:22px; top:22px; display:flex; align-items:center; gap:7px; color:#5b6678; font-size:12px; font-weight:700; }
+  .heatmap{
+    position:absolute; left:20px; top:60px; width:350px; height:274px; border-radius:3px; overflow:hidden;
+    background:#bbd8f9;
+  }
+  .heat-cell{ position:absolute; border-right:1px solid rgba(255,255,255,.18); border-bottom:1px solid rgba(255,255,255,.18); }
+  .heat-legend{ position:absolute; left:20px; right:20px; bottom:28px; display:flex; align-items:center; gap:13px; }
+  .heat-text{ font-size:12px; color:#5a6679; font-weight:700; }
+  .heat-bar{ height:10px; flex:1; border-radius:999px; background:linear-gradient(90deg,#b6d8ff 0%,#bdebb5 28%,#fff86d 52%,#ffb23d 76%,#f53f36 100%); }
+
+  .ai-result-box{ position:absolute; left:18px; right:18px; top:64px; height:114px; background:linear-gradient(145deg,#f7fbff 0%,#fff 100%); border-radius:10px; display:flex; align-items:center; padding:0 24px; }
+  .big-check{ width:57px; height:57px; border-radius:50%; border:3px solid #41b562; display:flex; align-items:center; justify-content:center; margin-right:20px; flex:none; }
+  .big-check svg{ width:34px; height:34px; stroke:#41b562; stroke-width:3.5; fill:none; }
+  .ai-ok-title{ color:#2faa55; font-size:21px; font-weight:900; letter-spacing:-.6px; line-height:26px; }
+  .ai-ok-sub{ margin-top:7px; color:#596579; font-size:12px; font-weight:600; }
+  .basis-title{ position:absolute; left:33px; top:203px; font-size:14px; font-weight:900; letter-spacing:-.3px; color:#111827; }
+  .basis-list{ position:absolute; left:33px; right:24px; top:246px; }
+  .basis-row{ height:41px; display:flex; align-items:center; color:#3e4a5d; font-size:12px; font-weight:700; }
+  .basis-icon{ width:21px; height:21px; border-radius:50%; background:#ccefd8; display:flex; align-items:center; justify-content:center; margin-right:14px; }
+  .basis-icon svg{ width:12px; height:12px; stroke:#2ca653; stroke-width:3; fill:none; }
+  .basis-right{ margin-left:auto; color:#2bbb5e; border:1.5px solid #2bbb5e; width:13px; height:13px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+  .basis-right svg{ width:8px; height:8px; stroke:#2bbb5e; stroke-width:3; fill:none; }
+
+  .summary-list{ position:absolute; left:24px; right:25px; top:63px; }
+  .summary-row{ height:36px; border-bottom:1px solid #eef2f7; display:flex; align-items:center; }
+  .summary-row:last-child{ border-bottom:none; }
+  .sum-icon{ width:27px; height:27px; border-radius:50%; background:#eaf3ff; display:flex; align-items:center; justify-content:center; margin-right:12px; flex:none; }
+  .sum-icon svg{ width:17px; height:17px; stroke:#4285ff; fill:none; stroke-width:2.2; }
+  .sum-label{ color:#596579; font-size:13px; font-weight:700; letter-spacing:-.25px; }
+  .sum-value{ margin-left:auto; color:#111827; font-size:13px; font-weight:900; letter-spacing:-.2px; }
+
+  .chart-wrap{ position:absolute; left:25px; top:54px; width:418px; height:125px; }
+  .chart-svg{ width:418px; height:125px; overflow:visible; }
+  .axis-label{ fill:#526174; font-size:11px; font-weight:600; }
+  .grid-line{ stroke:#e9eef5; stroke-width:1; }
+  .csi-line{ fill:none; stroke:#227cff; stroke-width:2.1; stroke-linecap:round; stroke-linejoin:round; }
+
+  .alerts-list{ position:absolute; left:20px; right:20px; top:61px; }
+  .alert-row{ height:63px; border-bottom:1px solid #edf2f7; display:grid; grid-template-columns:31px 1fr 51px; column-gap:11px; align-items:center; }
+  .alert-row:last-child{ border-bottom:none; }
+  .alert-icon{ width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+  .alert-icon svg{ width:17px; height:17px; stroke-width:2.4; fill:none; }
+  .alert-icon.warn{ background:#fff0d4; color:#ffa407; }
+  .alert-icon.info{ background:#e8f2ff; color:#2f80ed; }
+  .alert-icon.danger{ background:#ffe9e9; color:#ff5656; }
+  .alert-title{ color:#1f2937; font-size:12px; font-weight:900; letter-spacing:-.35px; margin-bottom:6px; }
+  .alert-desc{ color:#5c6678; font-size:10.5px; font-weight:600; letter-spacing:-.25px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .alert-time{ align-self:start; margin-top:18px; color:#7a8595; font-size:10px; font-weight:700; text-align:right; }
+
+  .timeline-scale{ position:absolute; left:21px; right:29px; top:68px; display:flex; justify-content:space-between; color:#1f2937; font-size:11px; font-weight:700; }
+  .timeline-bar{ position:absolute; left:22px; right:29px; top:112px; height:11px; border-radius:99px; overflow:visible; }
+  .seg{ position:absolute; top:0; height:11px; border-radius:99px; box-shadow:inset 0 0 0 1px rgba(255,255,255,.25); }
+  .seg.sleep{ background:#7ea9ff; } .seg.wake{ background:#6dbf71; } .seg.meal{ background:#f6cc22; } .seg.rest{ background:#7ea9ff; } .seg.bad{ background:#ff5252; }
+  .now-line{ position:absolute; top:-15px; width:1px; height:110px; background:rgba(255,88,88,.25); }
+  .now-line:after{ content:""; position:absolute; left:-3px; top:94px; width:7px; height:7px; background:#ff5252; border-radius:50%; }
+  .timeline-icons{ position:absolute; left:33px; right:23px; bottom:34px; display:flex; justify-content:space-between; }
+  .time-item{ width:62px; text-align:center; color:#1f2937; }
+  .time-icon{ height:30px; display:flex; align-items:center; justify-content:center; margin-bottom:10px; }
+  .time-icon svg{ width:25px; height:25px; stroke-width:2.4; }
+  .time-name{ font-size:12px; font-weight:900; letter-spacing:-.25px; margin-bottom:9px; }
+  .time-range{ font-size:10px; color:#525f73; font-weight:700; white-space:nowrap; }
+  .time-item.danger .time-name,.time-item.danger .time-range{ color:#ff3f43; }
+
+  svg.fill-none{ fill:none; }
+  .stroke-current{ stroke:currentColor; }
+  .fill-current{ fill:currentColor; }
+
+  @media (max-width: 1024px){
+    .stage{ margin:0; transform-origin:top left; transform:scale(calc(100vw / 1024)); }
+    body{ min-height:calc(1536px * (100vw / 1024)); overflow-x:hidden; }
+  }
+</style>
+<style data-safe-dashboard-interactions="true">
+  .nav-item,.alert-row,.panel-link,.scenario-button{cursor:pointer;transition:background .18s ease,color .18s ease,transform .16s ease,box-shadow .18s ease,border-color .18s ease;}
+  .nav-item:focus-visible,.alert-row:focus-visible,.scenario-button:focus-visible{outline:3px solid rgba(47,128,237,.35);outline-offset:2px;}
+  .nav-item:active,.alert-row:active,.scenario-button:active{transform:scale(.985);}
+  .scenario-controls{position:absolute;left:0;right:0;top:283px;height:24px;z-index:8;display:flex;align-items:center;justify-content:flex-end;gap:8px;}
+  .scenario-label{margin-right:auto;color:#526174;font-size:12px;font-weight:900;letter-spacing:-.2px;}
+  .scenario-button{height:24px;min-width:74px;border:1px solid #d9e7f8;border-radius:999px;background:#fff;color:#42516a;font-size:11px;font-weight:900;padding:0 11px;box-shadow:0 5px 12px rgba(35,54,88,.055);}
+  .scenario-button.active{background:linear-gradient(135deg,#2f80ed,#58a1ff);border-color:#2f80ed;color:#fff;box-shadow:0 7px 15px rgba(47,128,237,.22);}
+  .stat-title.warn{color:#d89000}.stat-title.danger{color:#ef4444}.stat-title.green{color:#31a85a}.stat-title.blue{color:#0f74ff;}
+  .stat-icon.warn{background:#fff1d6;color:#e19a00;box-shadow:0 7px 18px rgba(225,154,0,.16)}
+  .stat-icon.danger{background:#ffe6e6;color:#ff4d4f;box-shadow:0 7px 18px rgba(255,82,82,.18)}
+  body.scenario-inactive .floor-highlight{fill:#fff7e2;stroke:#ffc85a;}
+  body.scenario-fall .floor-highlight{fill:#fff0f0;stroke:#ff7a7a;}
+  body.scenario-inactive .pin-ring{fill:#fff4d7;stroke:#ffbd38;} body.scenario-inactive .pin-circle{fill:#f5a400;}
+  body.scenario-fall .pin-ring{fill:#ffe6e6;stroke:#ff7979;} body.scenario-fall .pin-circle{fill:#ff5252;}
+  body.scenario-inactive .heatmap{filter:saturate(1.18) hue-rotate(17deg);} body.scenario-fall .heatmap{filter:saturate(1.35) hue-rotate(145deg) contrast(1.04);}
+  body.scenario-inactive .csi-line{stroke:#f5a400;} body.scenario-fall .csi-line{stroke:#ff5252;stroke-width:2.6;}
+  .dashboard-toast{position:fixed;left:50%;bottom:24px;z-index:90;min-width:270px;max-width:min(420px,calc(100vw - 32px));padding:12px 16px;border-radius:16px;background:rgba(17,24,39,.94);color:#fff;text-align:center;font-size:13px;font-weight:850;line-height:1.45;box-shadow:0 14px 30px rgba(15,23,42,.26);opacity:0;transform:translate(-50%,14px);pointer-events:none;transition:opacity .18s ease,transform .18s ease;}
+  .dashboard-toast.is-visible{opacity:1;transform:translate(-50%,0);}
+  @media (prefers-reduced-motion: reduce){.nav-item,.alert-row,.scenario-button,.dashboard-toast{transition:none!important}}
+</style></head>
+<body class="scenario-normal">
+<div class="stage">
+<svg aria-hidden="true" focusable="false" height="0" style="position:absolute" width="0">
+<symbol id="i-home" viewbox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5.2 9.7v10h5.2v-5.9h3.2v5.9h5.2v-10"></path></symbol>
+<symbol id="i-activity" viewbox="0 0 24 24"><path d="M2.8 12h4l2.1-7.5 4.2 15 2.4-7.5h5.7"></path></symbol>
+<symbol id="i-bell" viewbox="0 0 24 24"><path d="M18 8.5a6 6 0 0 0-12 0c0 7-3 7.5-3 9h18c0-1.5-3-2-3-9Z"></path><path d="M9.6 20a2.7 2.7 0 0 0 4.8 0"></path></symbol>
+<symbol id="i-bars" viewbox="0 0 24 24"><path d="M5 20V12"></path><path d="M11 20V7"></path><path d="M17 20V4"></path></symbol>
+<symbol id="i-doc" viewbox="0 0 24 24"><path d="M7 3h7l4 4v14H7z"></path><path d="M14 3v5h5"></path><path d="M9.5 12h6"></path><path d="M9.5 16h6"></path></symbol>
+<symbol id="i-gear" viewbox="0 0 24 24"><circle cx="12" cy="12" r="3.5"></circle><path d="M19.4 15a2 2 0 0 0 .4 2.2l.1.1-2.6 2.6-.1-.1a2 2 0 0 0-2.2-.4 2 2 0 0 0-1.2 1.8V21h-3.6v-.2A2 2 0 0 0 9 19a2 2 0 0 0-2.2.4l-.1.1-2.6-2.6.1-.1A2 2 0 0 0 4.6 15a2 2 0 0 0-1.8-1.2H2.6v-3.6h.2A2 2 0 0 0 4.6 9a2 2 0 0 0-.4-2.2l-.1-.1 2.6-2.6.1.1A2 2 0 0 0 9 4.6a2 2 0 0 0 1.2-1.8V2.6h3.6v.2A2 2 0 0 0 15 4.6a2 2 0 0 0 2.2-.4l.1-.1 2.6 2.6-.1.1A2 2 0 0 0 19.4 9a2 2 0 0 0 1.8 1.2h.2v3.6h-.2A2 2 0 0 0 19.4 15Z"></path></symbol>
+<symbol id="i-check" viewbox="0 0 24 24"><path d="m5 12.8 4.3 4.3L19.2 7"></path></symbol>
+<symbol id="i-pin" viewbox="0 0 24 24"><path d="M12 21s7-5.3 7-12a7 7 0 1 0-14 0c0 6.7 7 12 7 12Z"></path><circle cx="12" cy="9" r="2.3"></circle></symbol>
+<symbol id="i-walk" viewbox="0 0 24 24"><circle cx="12" cy="4.3" r="2.2"></circle><path d="M10.8 8.1 8.9 14l-2.8 4.2"></path><path d="M11.5 8.3 15 11l3.3.8"></path><path d="M10 14.5 14 18.8"></path><path d="M13.2 10.5 12 15.5"></path></symbol>
+<symbol id="i-wifi" viewbox="0 0 24 24"><path d="M3.3 8.4a13.8 13.8 0 0 1 17.4 0"></path><path d="M6.8 12a8.4 8.4 0 0 1 10.4 0"></path><path d="M10 15.4a3.2 3.2 0 0 1 4 0"></path><circle cx="12" cy="18.5" fill="currentColor" r="1.2" stroke="none"></circle></symbol>
+<symbol id="i-logout" viewbox="0 0 24 24"><path d="M10 5H5v14h5"></path><path d="M14 8l4 4-4 4"></path><path d="M18 12H9"></path></symbol>
+<symbol id="i-clock" viewbox="0 0 24 24"><circle cx="12" cy="12" r="7.5"></circle><path d="M12 7.5V12l3 1.7"></path></symbol>
+<symbol id="i-utensils" viewbox="0 0 24 24"><path d="M7 3v8"></path><path d="M4.8 3v4"></path><path d="M9.2 3v4"></path><path d="M7 11v10"></path><path d="M16.8 3c-2.3 1.8-2.8 4.8-1 7 .5.5 1 .7 1.6.8V21"></path></symbol>
+<symbol id="i-shield" viewbox="0 0 24 24"><path d="M12 3.5 18.5 6v5.3c0 4.2-2.4 7.5-6.5 9.2-4.1-1.7-6.5-5-6.5-9.2V6Z"></path><path d="M10.5 12.2 12 13.8l3-3.5"></path></symbol>
+<symbol id="i-moon" viewbox="0 0 24 24"><path d="M17.8 15.7A8 8 0 0 1 8.2 6.1 8 8 0 1 0 17.8 15.7Z"></path></symbol>
+<symbol id="i-sun" viewbox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2.5v2.4M12 19.1v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"></path></symbol>
+<symbol id="i-bed" viewbox="0 0 24 24"><path d="M4 7v11"></path><path d="M4 13h16"></path><path d="M20 11v7"></path><path d="M6 10h5v3H6z"></path><path d="M11 13V9h5a4 4 0 0 1 4 4"></path></symbol>
+<symbol id="i-warning" viewbox="0 0 24 24"><path d="M12 3 22 20H2Z"></path><path d="M12 9v5"></path><path d="M12 17.8h.01"></path></symbol>
+<symbol id="i-info" viewbox="0 0 24 24"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 10.5V16"></path><path d="M12 7.5h.01"></path></symbol>
+</svg>
+<aside class="sidebar">
+<div class="logo-wrap">
+<svg aria-hidden="true" class="wifi-logo" viewbox="0 0 36 36">
+<path d="M-2 15.5A24 24 0 0 1 19 26" fill="none" stroke="#317cff" stroke-linecap="round" stroke-width="5"></path>
+<path d="M-1 25.5a14 14 0 0 1 11 5" fill="none" stroke="#317cff" stroke-linecap="round" stroke-width="5"></path>
+<circle cx="2.8" cy="33" fill="#317cff" r="3.1"></circle>
+</svg>
+<div class="brand">SafeWave</div>
+<div class="tagline">AI Care Dashboard</div>
+</div>
+<nav class="nav">
+<div aria-label="홈 메뉴" class="nav-item active" data-nav-target="home" role="button" tabindex="0"><svg><use href="#i-home"></use></svg><span>홈</span></div>
+<div aria-label="실시간 모니터링 메뉴" class="nav-item" data-nav-target="monitoring" role="button" tabindex="0"><svg><use href="#i-activity"></use></svg><span>실시간 모니터링</span></div>
+<div aria-label="알림 3 메뉴" class="nav-item" data-nav-target="alerts" role="button" tabindex="0"><svg><use href="#i-bell"></use></svg><span>알림</span><b class="nav-badge">3</b></div>
+<div aria-label="통계 메뉴" class="nav-item" data-nav-target="stats" role="button" tabindex="0"><svg><use href="#i-bars"></use></svg><span>통계</span></div>
+<div aria-label="기록 메뉴" class="nav-item" data-nav-target="records" role="button" tabindex="0"><svg><use href="#i-doc"></use></svg><span>기록</span></div>
+<div aria-label="설정 메뉴" class="nav-item" data-nav-target="settings" role="button" tabindex="0"><svg><use href="#i-gear"></use></svg><span>설정</span></div>
+</nav>
+<div class="device-card">
+<div class="device-title"><svg><use href="#i-wifi"></use></svg><span>RuView</span></div>
+<div class="device-sub">Wi-Fi CSI Sensing</div>
+<div class="device-ok"><i class="dot"></i><span>시스템 연결 정상</span></div>
+<div class="device-btn">연결 상태 상세보기 <span style="font-size:15px;color:#8fa0b4">›</span></div>
+</div>
+<div class="logout"><svg><use href="#i-logout"></use></svg><span>로그아웃</span></div>
+</aside>
+<main class="main">
+<div class="main-content">
+<section class="topbar">
+<h1>안녕하세요, 보호자님 👋</h1>
+<div class="hello-sub">김영희 어르신의 오늘 상태를 확인하세요.</div>
+<div class="bell-area"><svg><use href="#i-bell"></use></svg><span class="bell-count">3</span></div>
+<div class="date-block">
+<div class="date-time">오전 10:30</div>
+<div class="date-day">2026.05.29 (금)</div>
+</div>
+</section>
+<section class="status-grid">
+<article class="stat-card" data-stat-card="risk">
+<div class="stat-label">위험 상태</div>
+<div class="stat-body">
+<div class="stat-icon green" data-field-icon="risk"><svg fill="none" stroke="currentColor" stroke-width="2.9" viewbox="0 0 24 24"><use href="#i-check"></use></svg></div>
+<div><div class="stat-title green" data-field="risk">정상</div><div class="stat-note" data-field="risk-note">현재 위험 없음</div></div>
+</div>
+</article>
+<article class="stat-card" data-stat-card="location">
+<div class="stat-label">현재 위치</div>
+<div class="stat-body">
+<div class="stat-icon blue" data-field-icon="location"><svg fill="none" stroke="currentColor" stroke-width="2.3" viewbox="0 0 24 24"><use href="#i-pin"></use></svg></div>
+<div><div class="stat-title blue" data-field="location">거실</div><div class="stat-note" data-field="location-note">최근 업데이트 10:30</div></div>
+</div>
+</article>
+<article class="stat-card" data-stat-card="activity">
+<div class="stat-label">활동 상태</div>
+<div class="stat-body">
+<div class="stat-icon blue" data-field-icon="activity"><svg fill="none" stroke="currentColor" stroke-width="2.2" viewbox="0 0 24 24"><use href="#i-walk"></use></svg></div>
+<div><div class="stat-title blue" data-field="activity">활동 중</div><div class="stat-note" data-field="activity-note">5분 전 움직임 감지</div></div>
+</div>
+</article>
+<article class="stat-card" data-stat-card="signal">
+<div class="stat-label">Wi-Fi 신호</div>
+<div class="stat-body">
+<div class="stat-icon blue" data-field-icon="signal"><svg fill="none" stroke="currentColor" stroke-width="2.3" viewbox="0 0 24 24"><use href="#i-wifi"></use></svg></div>
+<div><div class="stat-title blue" data-field="signal">안정</div><div class="stat-note" data-field="signal-note">신호 품질 좋음</div></div>
+</div>
+</article>
+</section><section aria-label="상황 시뮬레이션" class="scenario-controls"><span class="scenario-label">상황 시뮬레이션</span><button class="scenario-button active" data-scenario="normal" type="button">정상</button><button class="scenario-button" data-scenario="inactive" type="button">무활동 주의</button><button class="scenario-button" data-scenario="fall" type="button">낙상 의심</button></section>
+<section class="panel upper-left">
+<div class="panel-title">실시간 공간 모니터링 (RuView)</div>
+<div class="floor-wrap">
+<svg aria-label="공간 모니터링 평면도" class="floor-svg" viewbox="0 0 344 274">
+<defs>
+<filter height="150%" id="softShadow" width="150%" x="-25%" y="-25%"><fedropshadow dx="0" dy="4" flood-color="#3b82f6" flood-opacity=".08" stddeviation="7"></fedropshadow></filter>
+</defs>
+<rect fill="#fbfdff" height="266" rx="4" stroke="#d9e2ef" stroke-width="2" width="342" x="2" y="2"></rect>
+<rect class="floor-highlight" data-room-highlight="true" height="174" rx="2" width="168" x="172" y="2"></rect>
+<path class="floor-wall" d="M2 138H172 M172 2V268 M2 2H344V268H2Z"></path>
+<path class="floor-wall" d="M172 176H344 M172 138H344" opacity=".0"></path>
+<path class="floor-wall" d="M172 176H344"></path>
+<path class="floor-wall-thin" d="M172 138h-47 M2 138h115"></path>
+<path class="door" d="M125 138c0 0 18-1 28 0M150 138v-5"></path>
+<path class="door" d="M172 104c0 0-1 17 0 27M172 126h-5"></path>
+<path class="door" d="M210 176c0 0-1 32 0 51M210 180h-18"></path>
+<path class="door" d="M210 268c0 0 23-2 31 0M239 268v-5"></path>
+<text class="room-label" text-anchor="middle" x="81" y="40">침실</text>
+<text class="room-label" text-anchor="middle" x="257" y="40">거실</text>
+<text class="room-label" text-anchor="middle" x="81" y="185">주방</text>
+<text class="room-label" text-anchor="middle" x="257" y="211">화장실</text>
+<g class="furniture" transform="translate(56 71)">
+<rect height="31" rx="2" width="49" x="0" y="0"></rect>
+<rect fill="#eef3f9" height="11" rx="2" width="14" x="3" y="4"></rect>
+<path d="M0 11h49M17 0v31" stroke="#fff" stroke-width="1.4"></path>
+<rect height="37" rx="2" width="6" x="-3" y="-3"></rect>
+</g>
+<g class="furniture" transform="translate(67 207)">
+<rect height="13" rx="3" width="13" x="16" y="6"></rect>
+<rect height="13" rx="2" width="13" x="2" y="20"></rect>
+<rect height="13" rx="2" width="14" x="23" y="22"></rect>
+<rect height="20" rx="2" width="7" x="14" y="22"></rect>
+</g>
+<g class="furniture" transform="translate(258 231)">
+<rect height="15" rx="4" width="21" x="-10" y="0"></rect>
+<rect height="10" rx="2" width="11" x="-5" y="14"></rect>
+<rect height="8" rx="2" width="29" x="-14" y="22"></rect>
+</g>
+<g data-person-pin="true" transform="translate(257 109)">
+<circle class="pin-ring" r="31"></circle>
+<circle class="pin-circle" r="13.5"></circle>
+<path d="M0 8s7-5.2 7-11.5a7 7 0 1 0-14 0C-7 2.8 0 8 0 8Z" fill="#fff" transform="scale(.75) translate(0,-3)"></path>
+<circle cx="0" cy="-5" fill="#2f80ed" r="2.2"></circle>
+</g>
+</svg>
+</div>
+<div class="legend">
+<div class="legend-item"><span class="legend-dot" style="background:#89b7ff"></span>낮은 활동</div>
+<div class="legend-item"><span class="legend-dot" style="background:#74c98a"></span>보통 활동</div>
+<div class="legend-item"><span class="legend-dot" style="background:#f6b31c"></span>높은 활동</div>
+<div class="legend-item"><span class="legend-dot" style="background:#f45b54"></span>이상 활동</div>
+</div>
+</section>
+<section class="panel upper-right">
+<div class="panel-title">RuView 공간 감지 <span style="font-size:13px;font-weight:700;color:#475569">(CSI Heatmap)</span></div>
+<div class="heat-status" data-field="heat-status"><span class="dot"></span>실시간</div>
+<div class="heatmap" id="heatmap"></div>
+<div class="heat-legend"><span class="heat-text">낮음</span><div class="heat-bar"></div><span class="heat-text">높음</span></div>
+</section>
+<section class="panel mid-left">
+<div class="panel-title">AI 분석 결과</div>
+<div class="ai-result-box">
+<div class="big-check"><svg><use href="#i-check"></use></svg></div>
+<div><div class="ai-ok-title" data-field="ai-title">정상 활동</div><div class="ai-ok-sub" data-field="ai-sub">위험 징후가 감지되지 않았습니다.</div></div>
+</div>
+<div class="basis-title">AI 판단 근거</div>
+<div class="basis-list">
+<div class="basis-row" data-basis-row="0"><span class="basis-icon"><svg><use href="#i-check"></use></svg></span><span data-field="basis-0">Wi‑Fi 신호 변화 안정적</span><span class="basis-right"><svg><use href="#i-check"></use></svg></span></div>
+<div class="basis-row" data-basis-row="1"><span class="basis-icon"><svg><use href="#i-check"></use></svg></span><span data-field="basis-1">장시간 무활동 아님</span><span class="basis-right"><svg><use href="#i-check"></use></svg></span></div>
+<div class="basis-row" data-basis-row="2"><span class="basis-icon"><svg><use href="#i-check"></use></svg></span><span data-field="basis-2">이상 행동 패턴 없음</span><span class="basis-right"><svg><use href="#i-check"></use></svg></span></div>
+<div class="basis-row" data-basis-row="3"><span class="basis-icon"><svg><use href="#i-check"></use></svg></span><span data-field="basis-3">생활 패턴 정상 범위</span><span class="basis-right"><svg><use href="#i-check"></use></svg></span></div>
+</div>
+</section>
+<section class="panel summary-card">
+<div class="panel-title">오늘의 활동 요약</div>
+<div class="summary-list">
+<div class="summary-row" data-summary-row="0"><span class="sum-icon"><svg><use href="#i-clock"></use></svg></span><span class="sum-label">총 활동 시간</span><span class="sum-value">5시간 30분</span></div>
+<div class="summary-row" data-summary-row="1"><span class="sum-icon"><svg><use href="#i-utensils"></use></svg></span><span class="sum-label">이동 거리 (추정)</span><span class="sum-value">320m</span></div>
+<div class="summary-row" data-summary-row="2"><span class="sum-icon"><svg><use href="#i-bars"></use></svg></span><span class="sum-label">평균 활동 강도</span><span class="sum-value">보통</span></div>
+<div class="summary-row" data-summary-row="3"><span class="sum-icon"><svg><use href="#i-shield"></use></svg></span><span class="sum-label">마지막 활동</span><span class="sum-value">10:25 거실 이동</span></div>
+</div>
+</section>
+<section class="panel chart-card">
+<div class="panel-title">실시간 CSI 신호</div>
+<div class="panel-link">더보기 <span style="font-size:17px">›</span></div>
+<div class="chart-wrap">
+<svg aria-label="실시간 CSI 신호 그래프" class="chart-svg" viewbox="0 0 418 125">
+<g id="csi-grid"></g>
+<path class="csi-line" d="" id="csi-path"></path>
+</svg>
+</div>
+</section>
+<section class="panel alerts-card">
+<div class="panel-title">최근 알림</div>
+<div class="panel-link">전체보기 <span style="font-size:17px">›</span></div>
+<div class="alerts-list">
+<div class="alert-row" data-alert-open="true" role="button" tabindex="0"><div class="alert-icon warn"><svg><use href="#i-clock"></use></svg></div><div><div class="alert-title">이순신 어르신 움직임 주의</div><div class="alert-desc">45분 이상 움직임이 감지되지 않았습니다.</div></div><div class="alert-time">오전 09:25</div></div>
+<div class="alert-row" data-alert-open="true" role="button" tabindex="0"><div class="alert-icon info"><svg><use href="#i-info"></use></svg></div><div><div class="alert-title">김영희 어르신 활동 재개</div><div class="alert-desc">움직임이 감지되어 상태가 정상으로 변경되었습니다.</div></div><div class="alert-time">오전 08:41</div></div>
+<div class="alert-row" data-alert-open="true" role="button" tabindex="0"><div class="alert-icon danger"><svg><use href="#i-warning"></use></svg></div><div><div class="alert-title">박영수 어르신 낙상 의심</div><div class="alert-desc">감지 시스템에서 낙상 패턴이 감지되었습니다.</div></div><div class="alert-time">오전 07:32</div></div>
+<div class="alert-row" data-alert-open="true" role="button" tabindex="0"><div class="alert-icon info"><svg><use href="#i-info"></use></svg></div><div><div class="alert-title">시스템 점검 완료</div><div class="alert-desc">Wi‑Fi 센서 시스템 점검이 완료되었습니다.</div></div><div class="alert-time">오전 06:15</div></div>
+</div>
+</section>
+<section class="panel timeline-card">
+<div class="panel-title">24시간 활동 타임라인</div>
+<div class="panel-link">더보기 <span style="font-size:17px">›</span></div>
+<div class="timeline-scale"><span>00:00</span><span>04:00</span><span>08:00</span><span>12:00</span><span>16:00</span><span>20:00</span><span>24:00</span></div>
+<div class="timeline-bar">
+<span class="seg sleep" style="left:0;width:27.1%"></span>
+<span class="seg wake" style="left:27.1%;width:4.2%"></span>
+<span class="seg meal" style="left:31.4%;width:4.2%"></span>
+<span class="seg wake" style="left:36.0%;width:39.6%"></span>
+<span class="seg rest" style="left:78.0%;width:13.8%"></span>
+<span class="seg bad" style="left:92.0%;width:7.7%"></span>
+<span class="now-line" style="left:94.1%"></span>
+</div>
+<div class="timeline-icons">
+<div class="time-item"><div class="time-icon" style="color:#2f80ed"><svg fill="currentColor"><use href="#i-moon"></use></svg></div><div class="time-name">취침</div><div class="time-range">00:00 - 06:30</div></div>
+<div class="time-item"><div class="time-icon" style="color:#ffad0f"><svg fill="none" stroke="currentColor"><use href="#i-sun"></use></svg></div><div class="time-name">기상</div><div class="time-range">06:30 - 07:30</div></div>
+<div class="time-item"><div class="time-icon" style="color:#ffad0f"><svg fill="none" stroke="currentColor"><use href="#i-utensils"></use></svg></div><div class="time-name">식사</div><div class="time-range">07:30 - 08:30</div></div>
+<div class="time-item"><div class="time-icon" style="color:#34b85b"><svg fill="none" stroke="currentColor"><use href="#i-walk"></use></svg></div><div class="time-name">활동</div><div class="time-range">08:30 - 17:00</div></div>
+<div class="time-item"><div class="time-icon" style="color:#f4a000"><svg fill="none" stroke="currentColor"><use href="#i-bed"></use></svg></div><div class="time-name">휴식</div><div class="time-range">17:00 - 21:00</div></div>
+<div class="time-item danger"><div class="time-icon" style="color:#ff5252"><svg fill="none" stroke="currentColor"><use href="#i-warning"></use></svg></div><div class="time-name">이상 행동</div><div class="time-range">22:13</div></div>
+</div>
+</section>
+</div>
+</main>
+</div>
+<script>
+  (function createHeatmap(){
+    const el = document.getElementById('heatmap');
+    const cols = 18, rows = 13;
+    const w = 350 / cols, h = 274 / rows;
+    const stops = [
+      [0.00,[158,199,246]], [0.20,[187,222,246]], [0.35,[190,234,174]],
+      [0.52,[237,242,111]], [0.70,[255,193,70]], [0.86,[255,126,42]], [1.00,[239,58,45]]
+    ];
+    const hotspots = [
+      [12.6,7.1,1.05,2.55,2.05], [9.1,8.4,.55,3.3,2.1], [4.0,3.0,.45,2.2,2.0],
+      [14.0,5.0,.36,3.2,2.2], [11.6,2.0,-.25,1.7,1.5], [1.0,7.8,-.22,2.4,2.0], [6.7,1.0,-.10,3.4,1.4]
+    ];
+    function mix(a,b,t){return a.map((v,i)=>Math.round(v+(b[i]-v)*t));}
+    function color(v){
+      v=Math.max(0,Math.min(1,v));
+      for(let i=1;i<stops.length;i++){
+        if(v<=stops[i][0]){ const p=stops[i-1], n=stops[i]; return mix(p[1], n[1], (v-p[0])/(n[0]-p[0])); }
+      }
+      return stops[stops.length-1][1];
+    }
+    for(let y=0;y<rows;y++){
+      for(let x=0;x<cols;x++){
+        let v = .16 + .06*Math.sin(x*.9) + .04*Math.cos(y*1.2) + .035*Math.sin((x+y)*.65);
+        for(const [cx,cy,a,sx,sy] of hotspots){
+          const dx=(x-cx)/sx, dy=(y-cy)/sy; v += a*Math.exp(-(dx*dx+dy*dy));
+        }
+        const [r,g,b]=color(v);
+        const d=document.createElement('div');
+        d.className='heat-cell';
+        d.style.left=(x*w)+'px'; d.style.top=(y*h)+'px'; d.style.width=(w+0.6)+'px'; d.style.height=(h+0.6)+'px';
+        d.style.backgroundColor=`rgba(${r},${g},${b},.86)`;
+        el.appendChild(d);
+      }
+    }
+  })();
+
+  (function createChart(){
+    const svg = document.querySelector('.chart-svg');
+    const grid = document.getElementById('csi-grid');
+    const path = document.getElementById('csi-path');
+    const W=418,H=125, left=28, right=8, top=8, bottom=24;
+    const pw=W-left-right, ph=H-top-bottom;
+    const yTicks=[-20,-40,-60,-80,-100];
+    const xLabels=['10:10','10:15','10:20','10:25','10:30'];
+    function yScale(v){return top + ((v+20)/(-80))*ph;}
+    yTicks.forEach(v=>{
+      const y=yScale(v);
+      const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1',left); line.setAttribute('x2',left+pw); line.setAttribute('y1',y); line.setAttribute('y2',y); line.setAttribute('class','grid-line'); grid.appendChild(line);
+      const text=document.createElementNS('http://www.w3.org/2000/svg','text');
+      text.setAttribute('x',0); text.setAttribute('y',y+4); text.setAttribute('class','axis-label'); text.textContent=v; grid.appendChild(text);
+    });
+    xLabels.forEach((lab,i)=>{
+      const x=left + i*pw/(xLabels.length-1);
+      const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1',x); line.setAttribute('x2',x); line.setAttribute('y1',top); line.setAttribute('y2',top+ph); line.setAttribute('class','grid-line'); grid.appendChild(line);
+      const text=document.createElementNS('http://www.w3.org/2000/svg','text');
+      text.setAttribute('x',x-15); text.setAttribute('y',top+ph+18); text.setAttribute('class','axis-label'); text.textContent=lab; grid.appendChild(text);
+    });
+    const vals=[-65,-70,-63,-68,-66,-76,-64,-69,-60,-66,-62,-70,-54,-67,-64,-71,-62,-70,-66,-73,-58,-70,-55,-63,-82,-36,-68,-80,-69,-58,-42,-61,-72,-58,-66,-60,-68,-55,-62,-69,-53,-68,-57,-66,-70];
+    const pts=vals.map((v,i)=>[left+i*pw/(vals.length-1), yScale(v)]);
+    let d=`M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+    for(let i=1;i<pts.length;i++){ d += ` L ${pts[i][0].toFixed(1)} ${pts[i][1].toFixed(1)}`; }
+    path.setAttribute('d',d);
+  })();
+</script>
+<div aria-live="polite" class="dashboard-toast" role="status"></div><script>
+  (function(){
+    const scenarios = {
+      normal: {
+        toast:'정상 상황: 보호자와 돌봄 담당자에게는 별도 긴급 알림이 가지 않습니다.',
+        statusClass:'green', iconClass:'green', risk:'정상', riskNote:'현재 위험 없음',
+        location:'거실', locationNote:'최근 업데이트 10:30', activity:'활동 중', activityNote:'5분 전 움직임 감지', signal:'안정', signalNote:'신호 품질 좋음',
+        aiTitle:'정상 활동', aiSub:'위험 징후가 감지되지 않았습니다.', alertCount:'3', heat:'실시간',
+        highlight:{x:172,y:2,width:168,height:174}, pin:'translate(257 109)',
+        basis:['Wi‑Fi 신호 변화 안정적','장시간 무활동 아님','이상 행동 패턴 없음','생활 패턴 정상 범위'],
+        csi:[-65,-70,-63,-68,-66,-76,-64,-69,-60,-66,-62,-70,-54,-67,-64,-71,-62,-70,-66,-73,-58,-70,-55,-63,-82,-36,-68,-80,-69,-58,-42,-61,-72,-58,-66,-60,-68,-55,-62,-69,-53,-68,-57,-66,-70]
+      },
+      inactive: {
+        toast:'무활동 주의: 앱에서 보호자/돌봄 담당자에게 확인 알림이 표시됩니다.',
+        statusClass:'warn', iconClass:'warn', risk:'주의', riskNote:'45분 이상 움직임 없음',
+        location:'침실', locationNote:'최근 업데이트 10:31', activity:'무활동 지속', activityNote:'마지막 활동 45분 전', signal:'안정', signalNote:'수신 품질 정상',
+        aiTitle:'무활동 주의', aiSub:'생활 패턴 대비 무활동 시간이 길어 확인이 필요합니다.', alertCount:'4', heat:'주의 감시',
+        highlight:{x:2,y:2,width:170,height:136}, pin:'translate(82 88)',
+        basis:['침실 구역에서 움직임 변화 낮음','45분 이상 위치 변화 없음','낙상형 급격 피크는 없음','보호자 확인 권장'],
+        csi:[-66,-68,-69,-70,-72,-74,-75,-76,-76,-77,-78,-78,-79,-79,-80,-80,-79,-80,-80,-81,-80,-80,-81,-80,-80,-79,-80,-80,-81,-80,-80,-79,-80,-80,-79,-80,-80,-79,-80,-79,-80,-80,-79,-80,-79]
+      },
+      fall: {
+        toast:'낙상 의심: 앱에 긴급 알림·전화하기·확인 완료 플로우가 표시됩니다.',
+        statusClass:'danger', iconClass:'danger', risk:'낙상 의심', riskNote:'급격 변화 후 무활동',
+        location:'침실', locationNote:'최근 업데이트 10:32', activity:'이상 패턴', activityNote:'충격 피크 후 정지', signal:'이상 피크', signalNote:'CSI 급변 감지',
+        aiTitle:'낙상 의심', aiSub:'급격한 신호 변화 뒤 무활동이 이어져 긴급 확인이 필요합니다.', alertCount:'5', heat:'긴급 감시',
+        highlight:{x:2,y:2,width:170,height:136}, pin:'translate(84 98)',
+        basis:['짧은 시간 강한 CSI 피크 발생','피크 이후 움직임 신호 급감','침실 구역에서 장시간 정지','보호자·돌봄 담당자 즉시 알림'],
+        csi:[-66,-67,-65,-70,-69,-72,-68,-71,-67,-69,-70,-66,-62,-58,-49,-35,-28,-83,-88,-86,-84,-82,-83,-84,-85,-84,-83,-84,-82,-80,-79,-80,-81,-80,-79,-80,-79,-78,-79,-80,-78,-79,-80,-79,-78]
+      }
+    };
+    const toast = document.querySelector('.dashboard-toast');
+    let toastTimer;
+    let activeScenario = 'normal';
+    function showToast(message){
+      clearTimeout(toastTimer);
+      toast.textContent = message;
+      toast.classList.add('is-visible');
+      toastTimer = setTimeout(() => toast.classList.remove('is-visible'), 2200);
+    }
+    function setClass(el, keep, value){
+      if(!el) return;
+      el.classList.remove('green','blue','warn','danger');
+      el.classList.add(value || keep || 'blue');
+    }
+    function setText(selector, value){ const el = document.querySelector(selector); if(el) el.textContent = value; }
+    function updateCsi(vals){
+      const path = document.getElementById('csi-path');
+      if(!path || !vals || !vals.length) return;
+      const W=418,H=125,left=28,right=8,top=8,bottom=24,pw=W-left-right,ph=H-top-bottom;
+      function yScale(v){return top + ((v+20)/(-80))*ph;}
+      const pts = vals.map((v,i)=>[left+i*pw/(vals.length-1), yScale(v)]);
+      path.setAttribute('d', pts.map((p,i)=>(i?'L':'M') + ' ' + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' '));
+    }
+    function setScenario(name){
+      const data = scenarios[name] || scenarios.normal;
+      activeScenario = scenarios[name] ? name : 'normal';
+      document.body.classList.remove('scenario-normal','scenario-inactive','scenario-fall');
+      document.body.classList.add('scenario-' + activeScenario);
+      document.querySelectorAll('[data-scenario]').forEach((btn) => btn.classList.toggle('active', btn.dataset.scenario === activeScenario));
+      setText('[data-field="risk"]', data.risk); setText('[data-field="risk-note"]', data.riskNote);
+      setText('[data-field="location"]', data.location); setText('[data-field="location-note"]', data.locationNote);
+      setText('[data-field="activity"]', data.activity); setText('[data-field="activity-note"]', data.activityNote);
+      setText('[data-field="signal"]', data.signal); setText('[data-field="signal-note"]', data.signalNote);
+      setText('[data-field="ai-title"]', data.aiTitle); setText('[data-field="ai-sub"]', data.aiSub);
+      setText('[data-field="heat-status"]', data.heat); setText('.bell-count', data.alertCount); setText('.nav-badge', data.alertCount);
+      setClass(document.querySelector('[data-field="risk"]'), null, data.statusClass);
+      setClass(document.querySelector('[data-field-icon="risk"]'), null, data.iconClass);
+      ['location','activity','signal'].forEach((field) => {
+        setClass(document.querySelector('[data-field="' + field + '"]'), null, activeScenario === 'normal' ? 'blue' : (field === 'signal' && activeScenario === 'fall' ? 'danger' : data.statusClass));
+        setClass(document.querySelector('[data-field-icon="' + field + '"]'), null, activeScenario === 'normal' ? 'blue' : (field === 'signal' && activeScenario === 'fall' ? 'danger' : data.iconClass));
+      });
+      const rect = document.querySelector('[data-room-highlight]');
+      if(rect && data.highlight){ Object.entries(data.highlight).forEach(([key,value]) => rect.setAttribute(key, value)); }
+      const pin = document.querySelector('[data-person-pin]');
+      if(pin) pin.setAttribute('transform', data.pin);
+      data.basis.forEach((text, index) => setText('[data-field="basis-' + index + '"]', text));
+      updateCsi(data.csi);
+      showToast(data.toast);
+    }
+    document.addEventListener('click', (event) => {
+      const scenario = event.target.closest('[data-scenario]');
+      if(scenario){ setScenario(scenario.dataset.scenario); return; }
+      const nav = event.target.closest('[data-nav-target]');
+      if(nav){
+        document.querySelectorAll('[data-nav-target]').forEach((item) => item.classList.toggle('active', item === nav));
+        showToast(nav.textContent.trim() + ' 메뉴를 선택했습니다. 현재 화면에서 데모 상태를 전환해 확인하세요.');
+        return;
+      }
+      const alert = event.target.closest('[data-alert-open]');
+      if(alert){
+        const title = alert.querySelector('.alert-title')?.textContent.trim() || '알림';
+        if(title.includes('낙상')) setScenario('fall');
+        else if(title.includes('움직임')) setScenario('inactive');
+        else setScenario('normal');
+      }
+    });
+    document.addEventListener('keydown', (event) => {
+      if(event.key !== 'Enter' && event.key !== ' ') return;
+      const control = event.target.closest('[role="button"],button');
+      if(!control) return;
+      event.preventDefault();
+      control.click();
+    });
+    const originalCreateChart = window.requestAnimationFrame || function(fn){ return setTimeout(fn, 0); };
+    originalCreateChart(function(){ setScenario('normal'); });
+    window.SafeWaveDashboardDemo = { setScenario, activeScenario: () => activeScenario, updateCsi, showToast };
+  })();
+</script></body>
+</html>

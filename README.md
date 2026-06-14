@@ -1,23 +1,33 @@
-# SafeWave Demo
+# SafeWave 앱·대시보드 통합 데모
 
-Wi-Fi CSI 기반 고령자 낙상·무활동 위험 감지 시스템 데모 사이트입니다.
+사용자가 제공한 두 HTML 스냅샷을 기준으로 기존 구현을 리셋하고, `index.html` 하나로 실행되는 발표용 인터랙티브 데모로 다시 구성했습니다.
+
+## 기준 파일
+
+- 앱 화면 원본: `C:\Users\js100\Downloads\safewave_mobile_ui.html` → 작업용 `app.html`
+- 대시보드 원본: `C:\Users\js100\Downloads\safewave_dashboard.html` → 작업용 `dashboard.html`
+- 실행 파일: `index.html` — 앱/대시보드를 iframe 없이 같은 DOM에 직접 포함한 단일 파일 데모
+
+## 반영 사항
+
+- `index.html` 하나만 열어도 앱과 대시보드가 모두 표시됩니다.
+- iframe, srcdoc, 외부 JS/CSS 로드 없이 동작합니다.
+- 앱 목업은 실제 휴대폰 비율에 맞춰 9:16으로 렌더링합니다.
+- 앱 탭/알림/상세/통계와 대시보드 정상·무활동·낙상 상황 시뮬레이션이 클릭으로 작동합니다.
 
 ## 실행
 
-가장 간단하게는 `index.html`을 더블클릭해 `file://`로 열 수 있습니다. 모듈 스크립트를 쓰지 않기 때문에 CORS 오류 없이 동작합니다.
+`index.html`을 더블클릭해서 열면 됩니다.
+
+또는:
 
 ```bash
-python3 -m http.server 4173
-# 또는 http://localhost:4173 열기
+npm run serve
+# http://localhost:4173 열기
 ```
 
-## 구성
+## 검증
 
-- `index.html` — 3개 화면(실시간 대시보드, 앱 구현 화면, 보고서 한눈에 보기)
-- `src/styles.css` — RE-RoadSchool풍 깔끔한 라이트 UI 스타일
-- `src/app.js` — 시나리오, 위험 점수, 그래프, 보호자·돌봄 담당자 알림/로그 상호작용
-- `tests/smoke.mjs` — 정적/기능 계약 검사
-
-## 주의
-
-이 데모는 실제 센서가 아닌 가상 CSI 데이터를 사용합니다. 원본 PDF의 개인정보/신청서 메타데이터는 렌더링하지 않고, SafeWave 아이디어 설명에 필요한 선별 정보만 사용합니다.
+```bash
+npm test
+```

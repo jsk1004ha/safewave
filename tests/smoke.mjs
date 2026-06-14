@@ -1,52 +1,105 @@
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import assert from 'node:assert/strict';
-import vm from 'node:vm';
 
-const html = readFileSync('index.html', 'utf8');
-const css = readFileSync('src/styles.css', 'utf8');
-const js = readFileSync('src/app.js', 'utf8');
-const readme = readFileSync('README.md', 'utf8');
-const renderedSource = [html, css, js, readme].join('\n');
-const model = vm.runInNewContext(`${js}\n({ scenarios, scoreScenario, riskLevel, generateSeries })`, { console, window: undefined, document: undefined, setInterval: () => 0 });
-const { scenarios, scoreScenario, riskLevel, generateSeries } = model;
+const index = readFileSync('index.html', 'utf8');
+const app = existsSync('app.html') ? readFileSync('app.html', 'utf8') : '';
+const dashboard = existsSync('dashboard.html') ? readFileSync('dashboard.html', 'utf8') : '';
+const allHtml = [index, app, dashboard].join('\n');
+const withoutDataUrls = allHtml.replace(/data:image\/[a-zA-Z0-9.+-]+;base64,[A-Za-z0-9+/=]+/g, '');
+const externalLoads = /(?:src|href|action)\s*=\s*["']https?:\/\//i.test(withoutDataUrls)
+  || /@import\s+url\(\s*["']?https?:\/\//i.test(withoutDataUrls)
+  || /url\(\s*["']?https?:\/\//i.test(withoutDataUrls);
 
-for (const label of ['실시간 대시보드', '앱 구현 화면', '보고서 한눈에']) assert(html.includes(label), `missing tab/screen label: ${label}`);
-assert(!html.includes('type="module"'), 'file:// mode must not use ES module script');
-assert.equal(scenarios.length, 7, 'must ship exactly seven curated SafeWave scenarios');
-for (const label of ['평상시 움직임', '휴식/누워 있음', '낙상 후 무활동', '실신/쓰러짐 의심', '장시간 무반응', '야간 이상 움직임', '침대/방 이탈 후 미복귀']) assert(scenarios.some((s) => s.label === label), `missing scenario ${label}`);
-for (const scenario of scenarios) {
-  const score = scoreScenario(scenario);
-  assert(score >= 0 && score <= 100, `${scenario.id} score out of range`);
-  assert(['safe', 'watch', 'danger'].includes(riskLevel(score)), `${scenario.id} invalid risk level`);
-  assert(scenario.evidence.length >= 3, `${scenario.id} must include AI rationale evidence`);
-  assert.equal(generateSeries(scenario.patternType, 0).length, 72, `${scenario.id} chart series length`);
-}
-const fall = scenarios.find((s) => s.id === 'fall');
-assert(scoreScenario(fall) >= 70 && riskLevel(scoreScenario(fall)) === 'danger', 'fall scenario must be danger');
-const normal = scenarios.find((s) => s.id === 'normal');
-assert(scoreScenario(normal) < 40, 'normal scenario must remain low risk');
-for (const fact of ['21.8%', '10.3%', '3.3% → 11.1%', '전남 29.0%', '경북 28.2%', '카메라 없음', '웨어러블 없음', 'Wi‑Fi CSI', 'RuView']) assert(html.includes(fact) || js.includes(fact), `missing required report fact: ${fact}`);
-assert(!html.includes('RuView GitHub</a>'), 'RuView GitHub link button should not be shown');
-assert(!html.includes('Live Observatory 열기'), 'RuView live external link button should not be shown');
-assert(html.includes('공간 기반 자동 감지'), 'smartwatch comparison must describe SafeWave as automatic spatial sensing');
-assert(!renderedSource.includes('공간 기반 수동 감지'), 'SafeWave should not be described as manual sensing');
-for (const phrase of ['보호자·돌봄 담당자 알림 앱', '알림 수신 대상', '보호자·돌봄 담당자 동시 수신', '보호자와 돌봄 담당자가 앱을 설치']) {
-  assert(html.includes(phrase), `caregiver app structure phrase missing: ${phrase}`);
-}
-assert(html.includes('exampleImage') && js.includes('renderExampleGallery'), 'missing RuView situation example image gallery');
-assert(html.includes('situationPreviewList') && js.includes('renderSituationPreviews'), 'missing situation-by-situation notification preview');
-for (const imagePath of ['assets/ruview-examples/normal.svg','assets/ruview-examples/fall.svg','assets/ruview-examples/inactivity.svg','assets/ruview-examples/room-exit.svg']) assert(renderedSource.includes(imagePath), `missing example image path ${imagePath}`);
-for (const file of readdirSync('assets/ruview-examples').filter((name) => name.endsWith('.svg'))) {
-  const svg = readFileSync(`assets/ruview-examples/${file}`, 'utf8');
-  assert(!/[가-힣]/.test(svg), `${file} must avoid Korean text inside SVG to prevent missing-glyph boxes in headless/file renderers`);
-}
-for (const pattern of [/010\d{8}/, /20091004/, /20090413/, /01032669803/, /01063326367/, /01033820943/, /김준서/, /이도훈/, /엄지오/, /생년월일/, /연락처/, /주소/, /이메일/]) assert(!pattern.test(renderedSource), `forbidden raw PDF personal/application metadata leaked: ${pattern}`);
-assert(css.includes('--bg: #f7f9fc'), 'clean RE-RoadSchool light background token missing');
-assert(css.includes('--shadow: 0 12px 30px rgba(15, 23, 42, 0.07)'), 'clean card shadow token missing');
-assert(!css.includes('@import url('), 'static file:// demo must not depend on remote Google Fonts import');
-assert(!js.includes('role\', \'listitem') && !js.includes('role", "listitem'), 'scenario buttons must keep native button semantics');
-assert(/\.score-ring\s*\{[\s\S]*display:\s*flex[\s\S]*flex-direction:\s*column/.test(css), 'risk score ring must vertically center score and /100 as one column');
-assert(/\.score-ring small\s*\{[\s\S]*margin-left:\s*0/.test(css), 'risk score /100 label must not push score off-center');
-assert(css.includes('prefers-reduced-motion'), 'reduced motion support missing');
-assert(html.includes('role="img"') && html.includes('aria-describedby="chartSummary"'), 'chart accessibility summary missing');
-console.log('SafeWave smoke contract passed');
+assert(index.includes('data-source-app="safewave_mobile_ui.html"'), 'index must declare mobile app source file');
+assert(index.includes('data-source-dashboard="safewave_dashboard.html"'), 'index must declare dashboard source file');
+assert(index.includes('id="app-demo"'), 'index must directly render the copied app html in the page DOM');
+assert(index.includes('id="dashboard-demo"'), 'index must directly render the copied dashboard html in the page DOM');
+assert(!/<iframe\b/i.test(index), 'index must not use iframe embedding');
+assert(!/<template\b/i.test(index), 'index must not hide the demos inside runtime templates');
+assert(!/srcdoc\s*=/i.test(index), 'index must not use srcdoc embedding');
+assert(!/src=["']app\\.html["']/i.test(index), 'index must not depend on app.html at runtime');
+assert(!/src=["']dashboard\\.html["']/i.test(index), 'index must not depend on dashboard.html at runtime');
+assert(index.includes('앱 데모') && index.includes('대시보드'), 'index must provide app/dashboard view labels');
+assert(index.includes('data-phone-ratio="9:16"'), 'mobile demo must declare a 9:16 phone ratio');
+assert(index.includes('aspect-ratio:9/16'), 'mobile phone CSS must use a real 9:16 aspect ratio');
+
+assert(app.includes('SafeWave 보호자 앱 UI'), 'app.html title must come from safewave_mobile_ui.html');
+assert(app.includes('class="stage"'), 'app.html must preserve mobile UI stage');
+for (const phrase of [
+  '안녕하세요, 보호자님',
+  '오늘도 어르신의 안전을 확인하세요.',
+  '3명 관리 중',
+  '김영희 어르신',
+  '이순신 어르신',
+  '박말순 어르신',
+  '알림 상세',
+  '움직임 주의',
+  '전화하기',
+  '확인 완료',
+  '시간대별 활동 그래프',
+  '설정',
+]) assert(app.includes(phrase), `missing source mobile UI phrase: ${phrase}`);
+
+assert(dashboard.includes('SafeWave AI Care Dashboard'), 'dashboard.html title must come from safewave_dashboard.html');
+assert(dashboard.includes('class="stage"'), 'dashboard.html must preserve dashboard stage');
+for (const phrase of [
+  '실시간 모니터링',
+  '알림',
+  'nav-badge',
+  '김영희 어르신의 오늘 상태를 확인하세요.',
+  '위험 상태',
+  '현재 위험 없음',
+  '실시간 공간 모니터링',
+  'RuView',
+  '침실',
+  '거실',
+  '주방',
+  '화장실',
+]) assert(dashboard.includes(phrase), `missing source dashboard phrase: ${phrase}`);
+
+for (const stale of [
+  '실시간 안전 대시보드',
+  '보고서 한눈에 보기',
+  'RUVIEW EXAMPLE IMAGE',
+  'assets/ruview-examples',
+  'src/app.js',
+  'src/styles.css',
+  'Wi‑Fi CSI 시뮬레이션',
+]) assert(!index.includes(stale), `old demo artifact must be removed from index: ${stale}`);
+
+assert(!allHtml.includes('type="module"'), 'file:// demo must not use module scripts');
+assert(!externalLoads, 'demo should not load external network resources');
+assert(!existsSync('src/app.js'), 'old app.js should be removed for reset implementation');
+assert(!existsSync('src/styles.css'), 'old styles.css should be removed for reset implementation');
+assert(!existsSync('assets/ruview-examples'), 'old RuView generated image assets should be removed for reset implementation');
+
+assert(index.includes('SafeWaveShellDemo'), 'wrapper must expose interactive tab switching helper');
+assert(index.includes('data-view-target="app"') && index.includes('data-view-target="dashboard"'), 'wrapper tabs must have clickable view targets');
+assert(index.includes('SafeWaveMobileDemo'), 'single-file index must embed the interactive mobile app demo');
+assert(index.includes('SafeWaveDashboardDemo'), 'single-file index must embed the interactive dashboard demo');
+
+assert(app.includes('SafeWaveMobileDemo'), 'mobile app demo must expose an interaction helper');
+for (const marker of [
+  'data-app-screen="home"',
+  'data-app-screen="elder"',
+  'data-app-screen="alerts"',
+  'data-app-screen="alert-detail"',
+  'data-app-screen="stats"',
+  'data-app-screen="settings"',
+  'data-tab-target="alerts"',
+  'data-action="call"',
+  'data-action="confirm"',
+  'interaction-toast',
+]) assert(app.includes(marker), `mobile app demo must include interactive marker: ${marker}`);
+
+assert(dashboard.includes('SafeWaveDashboardDemo'), 'dashboard demo must expose an interaction helper');
+for (const marker of [
+  'data-nav-target="monitoring"',
+  'data-scenario="normal"',
+  'data-scenario="inactive"',
+  'data-scenario="fall"',
+  'dashboard-toast',
+  '상황 시뮬레이션',
+]) assert(dashboard.includes(marker), `dashboard demo must include interactive marker: ${marker}`);
+
+console.log('SafeWave app/dashboard HTML smoke contract passed');

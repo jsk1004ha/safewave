@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="SafeWave Wi-Fi CSI 기반 고령자 낙상·무활동 위험 감지 데모" />
+    <title>SafeWave Demo — Wi-Fi 공간감지 안전 대시보드</title>
+    <link rel="stylesheet" href="src/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">본문 바로가기</a>
+    <header class="topbar" aria-label="SafeWave 데모 상단 영역">
+      <div class="brand" aria-label="SafeWave">
+        <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+          <path d="M10 36c8-18 36-18 44 0" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
+          <path d="M18 42c5-10 23-10 28 0" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" opacity=".7" />
+          <path d="M27 48c2-4 8-4 10 0" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" opacity=".5" />
+          <circle cx="32" cy="28" r="5" fill="currentColor" />
+        </svg>
+        <div>
+          <strong>SafeWave</strong>
+          <span>Wi‑Fi CSI AI Safety Demo</span>
+        </div>
+      </div>
+      <nav class="tabs" aria-label="주요 화면 전환">
+        <button class="tab is-active" type="button" data-tab="dashboard" aria-controls="dashboard" aria-selected="true">실시간 대시보드</button>
+        <button class="tab" type="button" data-tab="app" aria-controls="app" aria-selected="false">앱 구현 화면</button>
+        <button class="tab" type="button" data-tab="report" aria-controls="report" aria-selected="false">보고서 한눈에</button>
+      </nav>
+      <div class="header-actions">
+        <span class="live-pill" aria-label="시뮬레이션 상태"><span class="pulse-dot" aria-hidden="true"></span> LIVE SIM</span>
+      </div>
+    </header>
+
+    <main id="main" class="shell">
+      <section class="hero panel-grid" aria-labelledby="hero-title">
+        <div class="hero-copy glass-card">
+          <p class="eyebrow">카메라 없이 · 착용 없이 · 기존 Wi‑Fi 기반</p>
+          <h1 id="hero-title">고령자 낙상·무활동 위험을 Wi‑Fi 신호 변화로 조기 확인하는 데모</h1>
+          <p>
+            SafeWave는 RuView의 Wi‑Fi CSI 공간감지 개념을 활용해 갑작스러운 신호 변화, 이후 무활동,
+            평소 생활 패턴 차이를 종합해 보호자 확인이 필요한 상황을 시각화합니다.
+          </p>
+          <div class="hero-badges" aria-label="핵심 차별점">
+            <span>사생활 보호</span>
+            <span>착용 불필요</span>
+            <span>위험 우선순위</span>
+            <span>RuView 연동</span>
+          </div>
+        </div>
+        <aside class="status-card glass-card" aria-live="polite">
+          <span class="section-label">현재 안전 상태</span>
+          <div class="score-ring" id="scoreRing" style="--score: 18" aria-label="응급 위험 점수">
+            <span id="riskScore">18</span>
+            <small>/100</small>
+          </div>
+          <strong id="stateLabel">평상시 움직임</strong>
+          <p id="stateSummary">완만한 CSI 변화와 낮은 무활동 시간이 감지됩니다.</p>
+        </aside>
+      </section>
+
+      <section id="dashboard" class="screen is-active" data-screen="dashboard" aria-labelledby="dashboard-title">
+        <div class="screen-heading">
+          <div>
+            <p class="eyebrow">Screen 01</p>
+            <h2 id="dashboard-title">실시간 안전 대시보드</h2>
+          </div>
+          <p>시나리오를 선택하면 CSI 그래프, 위험 점수, AI 근거, 보호자 알림, 이벤트 로그가 함께 바뀝니다.</p>
+        </div>
+
+        <section class="ruview-panel glass-card" aria-labelledby="ruview-title">
+          <div class="ruview-copy">
+            <span class="section-label">RuView 활용 포인트</span>
+            <h3 id="ruview-title">RuView를 사용했을 때 상황별로 보이는 예시 이미지</h3>
+            <p>
+              실제 외부 데모 화면을 삽입하지 않고, RuView의 Wi‑Fi CSI 공간감지 결과를 SafeWave 대시보드에서
+              어떻게 해석해 보여줄지 예시 이미지로 구성했습니다. 상황 버튼을 누르면 대표 이미지와 위험 문구가 함께 바뀝니다.
+            </p>
+            <div class="link-row info-pills" aria-label="RuView 기반 기능 요약">
+              <span>Wi‑Fi CSI 공간 감지</span>
+              <span>카메라 없는 움직임 추정</span>
+              <span>낙상/무활동 상태 시각화</span>
+            </div>
+          </div>
+          <div class="ruview-example-viewer" aria-label="RuView 상황별 예시 이미지 큰 보기">
+            <div class="example-main-card">
+              <div class="example-main-head">
+                <span>RUVIEW EXAMPLE IMAGE</span>
+                <strong id="exampleImageTitle">평상시 움직임</strong>
+              </div>
+              <img id="exampleImage" src="assets/ruview-examples/normal.svg" alt="RuView 사용 시 평상시 움직임 예시 이미지" />
+              <p id="exampleImageCaption">완만한 CSI 파형과 서있는 포즈가 표시되고, 보호자 알림은 보류됩니다.</p>
+            </div>
+            <div id="exampleThumbList" class="example-thumbs" aria-label="상황별 예시 이미지 선택"></div>
+          </div>
+        </section>
+
+        <div class="dashboard-layout">
+          <section class="glass-card chart-card" aria-labelledby="chart-title">
+            <div class="card-header">
+              <div>
+                <span class="section-label">Wi‑Fi CSI 시뮬레이션</span>
+                <h3 id="chart-title">신호 변화량 · 이상 피크 하이라이트</h3>
+              </div>
+              <button id="pauseBtn" class="icon-button" type="button" aria-pressed="false" aria-label="그래프 움직임 일시정지">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h3v14H8zM13 5h3v14h-3z" /></svg>
+              </button>
+            </div>
+            <canvas id="csiChart" width="960" height="360" role="img" aria-describedby="chartSummary"></canvas>
+            <p id="chartSummary" class="chart-summary">평상시 움직임: 완만한 신호 변화, 위험 점수 18점.</p>
+            <div class="chart-legend" aria-label="그래프 범례">
+              <span><i class="legend-line normal"></i> CSI 변화량</span>
+              <span><i class="legend-dot anomaly"></i> 이상 피크</span>
+              <span><i class="legend-band"></i> 무활동 구간</span>
+            </div>
+          </section>
+
+          <aside class="glass-card scenario-card" aria-labelledby="scenario-title">
+            <span class="section-label">인터랙티브 상황 선택</span>
+            <h3 id="scenario-title">AI 판단 시나리오</h3>
+            <div id="scenarioList" class="scenario-list" role="list"></div>
+          </aside>
+        </div>
+
+        <section class="situation-preview glass-card" aria-labelledby="situation-preview-title">
+          <div class="card-header compact">
+            <div>
+              <span class="section-label">상황별 표시 예시</span>
+              <h3 id="situation-preview-title">어떤 상황에는 앱과 대시보드에 어떻게 뜨나요?</h3>
+            </div>
+            <p>각 상황을 누르면 위 그래프와 보호자 앱 알림이 같은 내용으로 즉시 바뀝니다.</p>
+          </div>
+          <div id="situationPreviewList" class="situation-grid" aria-label="상황별 알림 표시 예시"></div>
+        </section>
+
+
+
+        <div class="metric-grid">
+          <article class="metric glass-card">
+            <span>갑작스러운 변화</span>
+            <strong id="spikeMetric">낮음</strong>
+            <small>큰 CSI 피크 +30</small>
+          </article>
+          <article class="metric glass-card">
+            <span>무활동 지속</span>
+            <strong id="inactiveMetric">2분</strong>
+            <small>장시간 정지 +30</small>
+          </article>
+          <article class="metric glass-card">
+            <span>패턴 차이</span>
+            <strong id="patternMetric">8%</strong>
+            <small>평소와 다름 +15</small>
+          </article>
+          <article class="metric glass-card">
+            <span>알림 단계</span>
+            <strong id="alertLevel">낮음</strong>
+            <small>0–39 낮음 · 40–69 주의 · 70+ 위험</small>
+          </article>
+        </div>
+
+
+
+        <div class="insight-grid">
+          <section class="glass-card" aria-labelledby="ai-title">
+            <div class="card-header compact">
+              <div>
+                <span class="section-label">AI 판단 근거</span>
+                <h3 id="ai-title">왜 이 점수가 나왔나</h3>
+              </div>
+            </div>
+            <ul id="evidenceList" class="evidence-list"></ul>
+          </section>
+
+          <section class="glass-card alert-card" aria-labelledby="alert-title">
+            <span class="section-label">보호자 알림 예시</span>
+            <h3 id="alert-title">확정 진단이 아닌 “확인 필요” 알림</h3>
+            <p id="alertMessage">현재는 평상시 움직임으로 보입니다. 정기 모니터링을 유지합니다.</p>
+            <button id="sendAlertBtn" class="primary-button" type="button">보호자 확인 요청 보내기</button>
+            <p id="toast" class="toast" role="status" aria-live="polite"></p>
+          </section>
+
+          <section class="glass-card event-card" aria-labelledby="events-title">
+            <span class="section-label">최근 이벤트 기록</span>
+            <h3 id="events-title">대시보드 로그</h3>
+            <ol id="eventLog" class="event-log"></ol>
+          </section>
+        </div>
+
+
+      </section>
+
+      <section id="app" class="screen" data-screen="app" aria-labelledby="app-title" hidden>
+        <div class="screen-heading">
+          <div>
+            <p class="eyebrow">Screen 02</p>
+            <h2 id="app-title">보호자·돌봄 담당자 알림 앱</h2>
+          </div>
+          <p>보호자와 돌봄 담당자가 앱을 설치한 뒤 위험 알림을 수신하고, 상태 확인과 대응을 진행하는 화면입니다.</p>
+        </div>
+
+        <div class="app-layout">
+          <div class="phone-shell" aria-label="SafeWave 보호자와 돌봄 담당자 알림 앱 미리보기">
+            <div class="phone-top"><span></span><strong>보호자 알림</strong><span></span></div>
+            <div class="app-install-banner">
+              <span>알림 수신 대상</span>
+              <strong>보호자·돌봄 담당자 동시 수신</strong>
+              <p>고령자 조작 없이, 집 안 Wi‑Fi 감지 결과가 설치된 앱으로 전달됩니다.</p>
+            </div>
+            <div class="phone-card danger-gradient" id="phoneStatusCard">
+              <small id="phoneRoom">거실 · Wi‑Fi CSI node 02</small>
+              <strong id="phoneState">평상시 움직임</strong>
+              <p id="phoneAlert">현재는 평상시 움직임으로 보입니다. 정기 모니터링을 유지합니다.</p>
+            </div>
+            <div class="phone-score-row">
+              <div><span>위험 점수</span><strong id="phoneScore">18</strong></div>
+              <div><span>무활동</span><strong id="phoneInactive">2분</strong></div>
+              <div><span>패턴 차이</span><strong id="phonePattern">8%</strong></div>
+            </div>
+            <div class="phone-section">
+              <h3>확인 플로우</h3>
+              <button class="app-action" type="button" data-action="call">보호자 전화 연결</button>
+              <button class="app-action" type="button" data-action="neighbor">근처 돌봄 담당자 확인 요청</button>
+              <button class="app-action muted" type="button" data-action="note">상황 메모 남기기</button>
+              <p id="phoneActionResult" role="status" aria-live="polite">상황을 선택하면 권장 대응이 표시됩니다.</p>
+            </div>
+            <div class="phone-section compact-list">
+              <h3>최근 알림</h3>
+              <ul id="phoneNotifications"></ul>
+            </div>
+          </div>
+
+          <aside class="glass-card app-explainer" aria-labelledby="app-flow-title">
+            <span class="section-label">앱 UX 설계</span>
+            <h3 id="app-flow-title">고령자는 조작하지 않아도 되고, 보호자·돌봄 담당자 앱으로만 알림</h3>
+            <p class="app-owner-copy">고령자 본인이 앱을 계속 켜거나 착용할 필요가 없습니다. SafeWave는 공간에서 자동 감지하고, 보호자와 돌봄 담당자가 설치한 앱으로 확인 요청을 보냅니다.</p>
+            <div class="flow-steps">
+              <div><span>01</span><strong>자동 감지</strong><p>Wi‑Fi CSI 변화와 무활동 패턴을 수집합니다.</p></div>
+              <div><span>02</span><strong>AI 분류</strong><p>평상시·휴식·낙상 의심·장시간 무반응을 구분합니다.</p></div>
+              <div><span>03</span><strong>위험 점수</strong><p>갑작스러운 피크, 무활동, 시간대, 복귀 여부를 점수화합니다.</p></div>
+              <div><span>04</span><strong>확인 알림</strong><p>“확정”이 아니라 “확인 필요”로 보호자에게 전달합니다.</p></div>
+            </div>
+            <div class="mini-scenarios" aria-label="앱 화면에서도 상황 선택 가능">
+              <h4>앱 화면 시나리오 전환</h4>
+              <div id="appScenarioList" class="scenario-list small" role="list"></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="report" class="screen" data-screen="report" aria-labelledby="report-title" hidden>
+        <div class="screen-heading">
+          <div>
+            <p class="eyebrow">Screen 03</p>
+            <h2 id="report-title">보고서 한눈에 보기</h2>
+          </div>
+          <p>문제 근거, 작동 구조, 차별점, 기대효과를 한 화면에서 심사자가 빠르게 이해하도록 정리했습니다.</p>
+        </div>
+
+        <div class="report-grid">
+          <article class="glass-card stat-card">
+            <span class="section-label">고령화</span>
+            <strong>21.8%</strong>
+            <p>2026년 5월 전국 고령인구비율. 전남 29.0%, 경북 28.2%, 강원 27.5% 등 일부 지역은 더 높습니다.</p>
+          </article>
+          <article class="glass-card stat-card">
+            <span class="section-label">독거노인</span>
+            <strong>10.3%</strong>
+            <p>2024년 전국 독거노인가구비율. 혼자 생활할수록 사고 발견 지연 위험이 커집니다.</p>
+          </article>
+          <article class="glass-card stat-card">
+            <span class="section-label">낙상 위험</span>
+            <strong>3.3% → 11.1%</strong>
+            <p>65–69세부터 90세 이상까지 연령이 높아질수록 낙상 경험률이 증가합니다.</p>
+          </article>
+        </div>
+
+        <div class="architecture glass-card" aria-labelledby="architecture-title">
+          <span class="section-label">SafeWave 시스템 구조</span>
+          <h3 id="architecture-title">Wi‑Fi CSI → 전처리 → AI 분류 → 위험 점수 → 보호자 알림</h3>
+          <div class="pipeline" aria-label="시스템 파이프라인">
+            <div><span>01</span><strong>CSI 수집</strong><p>사람의 움직임으로 달라지는 Wi‑Fi 반사·감쇠·위상 변화를 기록</p></div>
+            <div><span>02</span><strong>특징 추출</strong><p>평균, 최대 변화량, 분산, 급격한 피크, 이후 움직임 감소 계산</p></div>
+            <div><span>03</span><strong>AI 분류</strong><p>평상시, 휴식, 장시간 무활동, 낙상/쓰러짐 의심, 야간 이상 움직임</p></div>
+            <div><span>04</span><strong>위험 통합</strong><p>0–100점으로 낮음·주의·위험 단계 표시</p></div>
+            <div><span>05</span><strong>확인 요청</strong><p>보호자·돌봄 담당자에게 확인 필요 알림 전송</p></div>
+          </div>
+        </div>
+
+        <div class="comparison-grid">
+          <section class="glass-card" aria-labelledby="diff-title">
+            <span class="section-label">특별한 점과 차별점</span>
+            <h3 id="diff-title">감시가 아니라, 사생활을 지키는 안전 신호</h3>
+            <div class="diff-list">
+              <div><strong>카메라 없음</strong><p>침실·화장실 근처처럼 민감한 공간에도 부담을 줄입니다.</p></div>
+              <div><strong>웨어러블 없음</strong><p>충전, 착용, 버튼 조작에 의존하지 않습니다.</p></div>
+              <div><strong>기존 Wi‑Fi 활용</strong><p>저가 CSI 노드와 기존 무선 환경으로 확장 가능성이 큽니다.</p></div>
+              <div><strong>낙상 전후까지 관찰</strong><p>단순 순간 피크가 아니라 이후 무활동과 생활 패턴 차이를 함께 봅니다.</p></div>
+              <div><strong>RuView-ready</strong><p>RuView의 존재·활동·낙상·생체 신호 감지 계층을 안전 UX로 연결합니다.</p></div>
+            </div>
+          </section>
+
+          <section class="glass-card" aria-labelledby="compare-title">
+            <span class="section-label">기존 방식 대비</span>
+            <h3 id="compare-title">CCTV·스마트워치·응급버튼의 빈틈 보완</h3>
+            <table class="compare-table">
+              <thead>
+                <tr><th>방식</th><th>한계</th><th>SafeWave 보완</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>CCTV</td><td>영상 사생활 부담</td><td>신호 변화만 사용</td></tr>
+                <tr><td>스마트워치</td><td>미착용·방전 가능</td><td>공간 기반 자동 감지</td></tr>
+                <tr><td>응급버튼</td><td>직접 눌러야 함</td><td>위험 의심 자동 알림</td></tr>
+                <tr><td>단순 움직임 센서</td><td>맥락 판단 부족</td><td>무활동·시간대·패턴 통합</td></tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
+
+        <section class="glass-card impact" aria-labelledby="impact-title">
+          <span class="section-label">기대효과</span>
+          <h3 id="impact-title">사고 발견 지연을 줄이고, 독립적인 생활을 더 안전하게</h3>
+          <div class="impact-cards">
+            <div><strong>고령자</strong><p>계속 촬영되거나 기기를 착용하지 않아도 안전 보조를 받을 수 있습니다.</p></div>
+            <div><strong>보호자</strong><p>모든 순간을 감시하지 않고 필요한 상황에 집중할 수 있습니다.</p></div>
+            <div><strong>지역사회</strong><p>독거노인 안전 확인과 돌봄 인력 대응 우선순위에 도움을 줍니다.</p></div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>SafeWave demo uses curated report facts only. No raw application-form personal data is rendered.</span>
+      <span>Prototype: simulated CSI · non-medical safety assistance</span>
+    </footer>
+
+    <script src="src/app.js"></script>
+  </body>
+</html>

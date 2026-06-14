@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="600" viewBox="0 0 960 600" data-scenario="night">
+<style>
+  text{font-family:Arial,Helvetica,sans-serif}
+  .bg{fill:#0b1533}
+  .grid{stroke:rgba(191,219,254,.12);stroke-width:1}
+  .card{fill:#111f46;stroke:rgba(191,219,254,.25);stroke-width:2}
+  .label{fill:#bfdbfe;font-size:20px;font-weight:900;letter-spacing:2px}
+  .title{fill:white;font-size:34px;font-weight:900;letter-spacing:1px}
+  .sub{fill:#dbeafe;font-size:22px;font-weight:700}
+  .chip{opacity:.18;stroke-width:2}
+  .chiptext{font-size:20px;font-weight:900}
+  .wave{fill:none;stroke-width:9;stroke-linecap:round;filter:url(#glow)}
+  .wave2{fill:none;stroke:#38bdf8;stroke-width:4;stroke-linecap:round;stroke-dasharray:12 16;opacity:.55}
+  .room{fill:rgba(255,255,255,.035);stroke:rgba(255,255,255,.16);stroke-width:2}
+  .furniture{fill:rgba(255,255,255,.12);stroke:rgba(255,255,255,.2);stroke-width:2}
+  .path{fill:none;stroke:#93c5fd;stroke-width:5;stroke-linecap:round;stroke-dasharray:8 12;opacity:.55}
+  .pose path{fill:none;stroke:#fff;stroke-width:15;stroke-linecap:round;stroke-linejoin:round;filter:url(#whiteGlow)}
+  .pose circle{fill:#60a5fa;stroke:white;stroke-width:5}
+  .read{fill:#172554;stroke:rgba(255,255,255,.22);stroke-width:1}
+  .readlabel{fill:#bfdbfe;font-size:16px;font-weight:900;letter-spacing:1px}
+  .readvalue{fill:white;font-size:23px;font-weight:900}
+</style>
+<defs>
+  <filter id="glow"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <filter id="whiteGlow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <radialGradient id="spot" cx="50%" cy="48%" r="58%"><stop stop-color="#7c5cff" stop-opacity=".22"/><stop offset="1" stop-color="#0b1533" stop-opacity="0"/></radialGradient>
+</defs>
+<rect class="bg" width="960" height="600" rx="34"/>
+<rect x="26" y="24" width="908" height="552" rx="28" fill="url(#spot)"/>
+<g opacity=".85">
+  <path class="grid" d="M80 42 V558"/><path class="grid" d="M160 42 V558"/><path class="grid" d="M240 42 V558"/><path class="grid" d="M320 42 V558"/><path class="grid" d="M400 42 V558"/><path class="grid" d="M480 42 V558"/><path class="grid" d="M560 42 V558"/><path class="grid" d="M640 42 V558"/><path class="grid" d="M720 42 V558"/><path class="grid" d="M800 42 V558"/><path class="grid" d="M880 42 V558"/>
+  <path class="grid" d="M46 100 H914"/><path class="grid" d="M46 170 H914"/><path class="grid" d="M46 240 H914"/><path class="grid" d="M46 310 H914"/><path class="grid" d="M46 380 H914"/><path class="grid" d="M46 450 H914"/><path class="grid" d="M46 520 H914"/>
+</g>
+<rect class="card" x="46" y="42" width="868" height="516" rx="28"/>
+<rect class="room" x="328" y="188" width="520" height="206" rx="26"/>
+<text class="label" x="78" y="88">RUVIEW + SAFEWAVE EXAMPLE</text>
+<text class="title" x="78" y="140">NIGHT ANOMALY</text>
+<text class="sub" x="78" y="178">Repeated night movement</text>
+<rect class="chip" x="708" y="70" width="166" height="54" rx="27" fill="#7c5cff" stroke="#7c5cff"/>
+<text class="chiptext" x="736" y="105" fill="#7c5cff">WATCH - 68</text>
+<path class="wave2" d="M120 352 C245 304 330 332 455 292 C590 252 700 284 842 242"/>
+<path class="wave" d="M96 302 C160 220 228 306 300 224 C380 140 456 296 540 202 C640 116 720 250 814 176" stroke="#7c5cff"/>
+<g class="pose"><circle cx="510" cy="178" r="18"/><path d="M510 198 L494 276"/><path d="M502 222 L452 206"/><path d="M502 224 L548 252"/><path d="M494 276 L444 350"/><path d="M494 276 L568 328"/><circle cx="452" cy="206" r="9"/><circle cx="548" cy="252" r="9"/><circle cx="444" cy="350" r="9"/><circle cx="568" cy="328" r="9"/></g>
+<g transform="translate(78 462)">
+  <rect class="read" width="190" height="70" rx="18"/><text class="readlabel" x="18" y="27">CSI STATE</text><text class="readvalue" x="18" y="56">NIGHT</text>
+</g>
+<g transform="translate(286 462)">
+  <rect class="read" width="150" height="70" rx="18"/><text class="readlabel" x="18" y="27">RISK</text><text class="readvalue" x="18" y="56">WATCH</text>
+</g>
+<g transform="translate(454 462)">
+  <rect class="read" width="190" height="70" rx="18"/><text class="readlabel" x="18" y="27">ACTION</text><text class="readvalue" x="18" y="56">CARE CHECK</text>
+</g>
+<g transform="translate(662 462)">
+  <rect class="read" width="190" height="70" rx="18"/><text class="readlabel" x="18" y="27">PRIVACY</text><text class="readvalue" x="18" y="56">NO CAMERA</text>
+</g>
+</svg>
